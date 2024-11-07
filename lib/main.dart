@@ -301,9 +301,13 @@ class _MainScreenState extends State<MainScreen> {
         return enums.Orientation.horizontal;
       } else if (remainingColumns == minPanelSize) {
         return enums.Orientation.vertical;
-      } else {
+      } else if (remainingColumns % maxPanelSize == 0) { //Es múltiplo del lado grande del panel
         return enums.Orientation.horizontal;
+      } else if (remainingColumns % minPanelSize == 0) { //Es múltiplo del lado pequeño del panel
+        return enums.Orientation.vertical;
       }
+
+      return enums.Orientation.horizontal;
     } else if (canBePlacedHorizontally) {
       print('Can be only placed horizontally.');
       return enums.Orientation.horizontal;
