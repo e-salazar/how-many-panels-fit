@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:how_many_panels_fit/enums/orientation.dart' as enums;
+import 'package:how_many_panels_fit/models/cell.dart' as models;
 
 void main() {
   runApp(const MyApp());
@@ -46,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
   int totalRows = 3;
   int panelColumnsSize = 2;
   int panelRowsSize = 3;
-  List<List<Cell>> grid = [];
+  List<List<models.Cell>> grid = [];
 
   @override
   Widget build(BuildContext context) {
@@ -171,7 +172,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       itemCount: totalColumns * totalRows,
       itemBuilder: (BuildContext context, int index) {
-        Cell cell = grid[index % totalColumns][(index ~/ totalColumns)];
+        models.Cell cell = grid[index % totalColumns][(index ~/ totalColumns)];
         return Container(
           decoration: BoxDecoration(
             border: Border.all(color: cell.isUsed ? cell.color : Colors.grey),
@@ -182,26 +183,26 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void setUsed(int column, int row, Color color) {
+  void setCellAsUsed(int column, int row, Color color) {
     grid[column][row].isUsed = true;
     grid[column][row].color = color;
   }
 
   bool _placePanel(int columnPosition, int rowPosition, int columnsSize, int rowsSize) {
-    if (!_canBePlacePanel(columnPosition, rowPosition, columnsSize, rowsSize)) {
+    if (!_canPlacePanel(columnPosition, rowPosition, columnsSize, rowsSize)) {
       return false;
     }
 
     Color color = getRandomColor();
     for (var i = columnPosition; i < columnPosition + columnsSize; i++) {
       for (var j = rowPosition; j < rowPosition + rowsSize; j++) {
-        setUsed(i, j, color);
+        setCellAsUsed(i, j, color);
       }
     }
 
     return true;
   }
-  bool _canBePlacePanel(int columnPosition, int rowPosition, int columnsSize, int rowsSize) {
+  bool _canPlacePanel(int columnPosition, int rowPosition, int columnsSize, int rowsSize) {
     if (columnPosition + columnsSize > totalColumns) {
       return false;
     }
@@ -220,7 +221,7 @@ class _MainScreenState extends State<MainScreen> {
   }
   
   int _placePanels() {
-    grid = List.generate(totalColumns, (int i) => List.generate(totalRows, (int j) => Cell()));
+    grid = List.generate(totalColumns, (int i) => List.generate(totalRows, (int j) => models.Cell()));
     int headColumn = 0;
     int headRow = 0;
 
@@ -286,8 +287,8 @@ class _MainScreenState extends State<MainScreen> {
   enums.Orientation? _getBestPosition(int headColumn, int headRow, int maxPanelSize, int minPanelSize) {
     int remainingColumns = totalColumns - headColumn;
     int remainingRows = totalRows - headRow;
-    bool canBePlacedHorizontally = _canBePlacePanel(headColumn, headRow, maxPanelSize, minPanelSize);
-    bool canBePlacedVertically = _canBePlacePanel(headColumn, headRow, minPanelSize, maxPanelSize);
+    bool canBePlacedHorizontally = _canPlacePanel(headColumn, headRow, maxPanelSize, minPanelSize);
+    bool canBePlacedVertically = _canPlacePanel(headColumn, headRow, minPanelSize, maxPanelSize);
     
     if (canBePlacedHorizontally && canBePlacedVertically) {
       print('Can be placed in any position. Finding most efficient.');
@@ -314,9 +315,4 @@ class _MainScreenState extends State<MainScreen> {
       return null;
     }
   }
-}
-
-class Cell {
-  bool isUsed = false;
-  Color color = Colors.transparent;
 }
